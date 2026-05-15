@@ -1,0 +1,38 @@
+package users_postgres_repository
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/FiL4an/golang-todoapp/internal/core/domain"
+)
+
+func (r *UserRepository) CreateUser(ctx context.Context, user domain.Users) (domain.Users, error) {
+	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
+	defer cancel()
+	query := `
+INSERT INTO todoapp.users(full_name, phone_number)
+VALUES($1, $2)
+RETURNING id , version , full_name, phone_number;
+`
+	row := r.pool.QueryRow(ctx, query, user.FullName, user.PhoneNumber)
+	var userModel UserModel
+
+	err := row.Scan(
+		&userModel.ID,
+		&userModel.Version,
+		&userModel.FullName,
+		&userModel.PhoneNumber,
+	)
+
+	if err != nil {
+		return domain.Users{}, fmt.Errorf("scan error:%w", err)
+	}
+	userDomain := domain.NewUsers(
+		userModel.ID,
+		userModel.Version,
+		userModel.FullName,
+		userModel.PhoneNumber,
+	)
+	return userDomain, nil
+}
