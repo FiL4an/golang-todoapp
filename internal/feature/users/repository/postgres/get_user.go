@@ -7,7 +7,7 @@ import (
 
 	"github.com/FiL4an/golang-todoapp/internal/core/domain"
 	core_errors "github.com/FiL4an/golang-todoapp/internal/core/errors"
-	"github.com/jackc/pgx/v5"
+	core_postgres_pool "github.com/FiL4an/golang-todoapp/internal/core/repository/postgres/pool"
 )
 
 func (r UserRepository) GetUser(ctx context.Context, id int) (domain.Users, error) {
@@ -15,7 +15,7 @@ func (r UserRepository) GetUser(ctx context.Context, id int) (domain.Users, erro
 	defer cancel()
 	query := `
 SELECT id, version, full_name, phone_number FROM todoapp.users 
-WHERE id = $1 
+WHERE id = $1; 
 `
 
 	row := r.pool.QueryRow(ctx, query, id)
@@ -28,7 +28,7 @@ WHERE id = $1
 	)
 	if err != nil {
 
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, core_postgres_pool.ErrNoRows) {
 			return domain.Users{}, fmt.Errorf("user with id= '%d': %w", id, core_errors.ErrNotFound)
 		}
 		return domain.Users{}, fmt.Errorf("scan error: %w", err)
