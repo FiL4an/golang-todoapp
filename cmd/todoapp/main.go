@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	core_config "github.com/FiL4an/golang-todoapp/internal/core/config"
 	core_logger "github.com/FiL4an/golang-todoapp/internal/core/logger"
 	core_pgx_pool "github.com/FiL4an/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_midleware "github.com/FiL4an/golang-todoapp/internal/core/transport/http/midleware"
@@ -21,12 +22,9 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	timeZone = time.UTC
-)
-
 func main() {
-	time.Local = timeZone
+	cfg := core_config.NewConfigMust()
+	time.Local = cfg.TimeZone
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT,
 		syscall.SIGTERM)
@@ -40,7 +38,7 @@ func main() {
 	}
 	defer logger.Close()
 
-	logger.Debug("application time zone", zap.Any("zone", timeZone))
+	logger.Debug("application time zone", zap.Any("zone", time.Local))
 	logger.Debug("initazling postgres connection pool")
 
 	pool, err := core_pgx_pool.NewConnectionPool(core_pgx_pool.NewConfigMust(), ctx)
