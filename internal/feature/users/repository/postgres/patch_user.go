@@ -48,7 +48,7 @@ func (r *UserRepository) PatchUser(ctx context.Context, id int, user domain.User
 				"user with  id='%d' concurrently accessed: %w",
 				id, core_errors.ErrConflict)
 		} else {
-			return domain.Users{}, fmt.Errorf("scan error ", err)
+			return domain.Users{}, fmt.Errorf("scan error : %w ", err)
 		}
 	}
 

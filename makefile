@@ -54,7 +54,14 @@ migrate-action:
 	-database postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@todoapp-postgres:5432/$(POSTGRES_DB)?sslmode=disable \
 	"$(action)"
 
-
+log-clean:
+	@read -p "Очистить все лог файлы? Опасность утери логов.[y/n]: " ans; \
+	if [ "$$ans" = "y" ]; then \
+		rm -rf ${PROJECT_ROOT}/out/logs/* && \
+		echo  "Лог файлы очищены";\
+	else \
+		echo "Очиста лог файлов отменена "; \
+	fi
 todoapp-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
