@@ -83,8 +83,8 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 func userPatchFromRequest(request PacthUserRequest) domain.UserPatch {
 	return domain.NewUserPatch(
-		request.FullName.ToDoamin(),
-		request.PhoneNumber.ToDoamin(),
+		request.FullName.ToDomain(),
+		request.PhoneNumber.ToDomain(),
 	)
 
 }
