@@ -13,6 +13,9 @@ import (
 	core_pgx_pool "github.com/FiL4an/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_midleware "github.com/FiL4an/golang-todoapp/internal/core/transport/http/midleware"
 	core_http_server "github.com/FiL4an/golang-todoapp/internal/core/transport/http/server"
+	statistics_postgres_repository "github.com/FiL4an/golang-todoapp/internal/feature/statistics/repository"
+	statistics_service "github.com/FiL4an/golang-todoapp/internal/feature/statistics/service"
+	statistics_transport_http "github.com/FiL4an/golang-todoapp/internal/feature/statistics/transport"
 	task_postgres_repository "github.com/FiL4an/golang-todoapp/internal/feature/tasks/repository/postgres"
 	task_service "github.com/FiL4an/golang-todoapp/internal/feature/tasks/service"
 	task_transport_http "github.com/FiL4an/golang-todoapp/internal/feature/tasks/transport/http"
@@ -53,11 +56,17 @@ func main() {
 	userService := users_service.NewUsersService(usersRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(userService)
 
-	logger.Debug("initializing", zap.String("feature", "tasks"))
+	logger.Debug("initializing feature", zap.String("feature", "tasks"))
 
 	tasksRepository := task_postgres_repository.NewTasksRepository(pool)
 	tasksService := task_service.NewTasksService(tasksRepository)
 	taskTransportHTTP := task_transport_http.NewTasksHTTPHandler(tasksService)
+
+	logger.Debug("initializing feature", zap.String("feature", "statistics"))
+
+	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsTransporHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
 
 	logger.Debug("initializing HTTP server")
 
@@ -73,6 +82,7 @@ func main() {
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegisterRouters(usersTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRouters(taskTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRouters(statisticsTransporHTTP.Routes()...)
 	httpServer.RegisterAPIRouters(apiVersionRouter)
 
 	if err := httpServer.Run(ctx); err != nil {
