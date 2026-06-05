@@ -74,3 +74,6 @@ todoapp-undeploy:
 	@docker compose down todoapp
 ps: 
 	@docker compose ps
+
+all-undeploy:
+	@docker compose down
