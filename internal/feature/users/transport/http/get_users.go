@@ -11,6 +11,17 @@ import (
 
 type GetUsersResponse []UserDTOResponse
 
+// GetUsers godoc
+// @Summary  Список  пользователей
+// @Description Просмотро списка пользователей с опциональной пагинацией
+// @Tags users
+// @Produce json
+// @Param limit query int false "Размер страницы с пользователями"
+// @Param offset query int false "Смещение страницы с пользователеми"
+// @Success 200 {object} GetUsersResponse "Получение всех пользователей"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /users [get]
 func (h *UsersHTTPHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
