@@ -8,7 +8,7 @@ env-down:
 	@docker compose down todoapp-postgres
 
 env-cleanup:
-	@read -p "Очистить все volume файлы Окружения? Опасность утери данных.[y/n]: " ans; \
+	@read -p "Очистить все volume файлы Окружения? Опасность утери данных.[y/n]:" ans; \
 	if [ "$$ans" = "y" ]; then \
 		docker compose down  todoapp-postgres port-forwarder && \
 		rm -rf ${PROJECT_ROOT}/out/pgdata && \
@@ -72,6 +72,16 @@ todoapp-deploy:
 	@docker compose up -d --build todoapp
 todoapp-undeploy: 
 	@docker compose down todoapp
+
+swagger-gen:
+	@docker compose run --rm swagger \
+		init \
+		-g cmd/todoapp/main.go \
+		-o docs \
+		--parseInternal \
+		--parseDependency
+	
+
 ps: 
 	@docker compose ps
 
