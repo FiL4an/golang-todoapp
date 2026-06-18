@@ -23,15 +23,15 @@ func (r *StatisticsRepository) GetTasks(ctx context.Context, userID *int, from *
 	args := []any{}
 	condition := []string{}
 	if userID != nil {
-		condition = append(condition, fmt.Sprintf("author_user_id=%d", len(args)+1))
+		condition = append(condition, fmt.Sprintf("author_user_id=$%d", len(args)+1))
 		args = append(args, userID)
 	}
 	if from != nil {
-		condition = append(condition, fmt.Sprintf("created_at>=%d", len(args)+1))
+		condition = append(condition, fmt.Sprintf("created_at>=$%d", len(args)+1))
 		args = append(args, from)
 	}
 	if to != nil {
-		condition = append(condition, fmt.Sprintf("created_at<%d", len(args)+1))
+		condition = append(condition, fmt.Sprintf("created_at<$%d", len(args)+1))
 		args = append(args, to)
 	}
 	if len(condition) > 0 {
