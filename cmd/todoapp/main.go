@@ -23,6 +23,9 @@ import (
 	users_postgres_repository "github.com/FiL4an/golang-todoapp/internal/feature/users/repository/postgres"
 	users_service "github.com/FiL4an/golang-todoapp/internal/feature/users/service"
 	users_transport_http "github.com/FiL4an/golang-todoapp/internal/feature/users/transport/http"
+	web_fs_repository "github.com/FiL4an/golang-todoapp/internal/feature/web/repository/file_system"
+	web_service "github.com/FiL4an/golang-todoapp/internal/feature/web/service"
+	web_transport_http "github.com/FiL4an/golang-todoapp/internal/feature/web/transport/http"
 	"go.uber.org/zap"
 )
 
@@ -75,6 +78,12 @@ func main() {
 	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
 	statisticsTransporHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
 
+	logger.Debug("initializing featue", zap.String("feature", "web"))
+
+	webRepository := web_fs_repository.NewWebResporitory()
+	webService := web_service.NewWebService(webRepository)
+	webTransport := web_transport_http.NewWebHTTPHandler(webService)
+
 	logger.Debug("initializing HTTP server")
 
 	httpServer := core_http_server.NewHTTPServer(
@@ -94,6 +103,8 @@ func main() {
 
 	httpServer.RegisterAPIRouters(apiVersionRouter)
 	httpServer.RegisterSwagger()
+	httpServer.RegisterRoutes(webTransport.Routes()...)
+	// httpServer.RegisterPublic()
 
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error(" HTTP server run error", zap.Error(err))

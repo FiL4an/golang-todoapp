@@ -32,6 +32,14 @@ func NewHTTPServer(
 	}
 }
 
+func (h *HTTPServer) RegisterRoutes(routes ...Route) {
+	for _, route := range routes {
+		pattern := fmt.Sprintf("%s %s", route.Method, route.Path)
+
+		h.mux.Handle(pattern, route.WithMiddleware())
+	}
+}
+
 func (h *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) {
 	for _, router := range routers {
 		prefix := "/api/" + string(router.apiVersion)
@@ -60,6 +68,10 @@ func (h *HTTPServer) RegisterSwagger() {
 		},
 	)
 }
+
+// func (h *HTTPServer) RegisterPublic() {
+// 	h.mux.Handle("/", http.FileServer(http.Dir("./public")))
+// }
 
 func (h *HTTPServer) Run(ctx context.Context) error {
 	mux := core_http_midleware.ChainMiddleware(h.mux, h.middleware...)
